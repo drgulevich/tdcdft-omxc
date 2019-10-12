@@ -17,8 +17,8 @@ if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
     message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 endif()
 
-include_directories( ../include/ )
-link_directories( ../ )
+include_directories( ../include/ ) # applies to all targets below
+link_directories( ../ ) # before the target is created
 add_executable(infqw infqw.cpp)
 target_link_libraries(infqw PRIVATE libtdcdft-omxc.a)
 target_link_libraries(infqw PRIVATE armadillo)

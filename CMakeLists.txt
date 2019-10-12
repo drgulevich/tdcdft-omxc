@@ -15,10 +15,10 @@ if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
     message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 endif()
 
-include_directories( ./include)
 #add_subdirectory(examples)
 file(GLOB SOURCES "src/*.cpp") # adding all sources of the kind src/*.cpp 
 add_library(tdcdft-omxc STATIC ${SOURCES})
+target_include_directories(tdcdft-omxc PRIVATE ./include/ )
 
 #install(TARGETS tdcdft-omxc
 #    LIBRARY DESTINATION /usr/local/lib
