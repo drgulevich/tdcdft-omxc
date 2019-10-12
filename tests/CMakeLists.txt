@@ -4,7 +4,7 @@ cmake_policy(SET CMP0015 NEW) # set relative path policy
 
 # flags
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS_RELEASE "-DARMA_NO_DEBUG -march=native -Ofast -std=c++14") # -fopenmp if needed
+set(CMAKE_CXX_FLAGS_RELEASE "-DARMA_NO_DEBUG -march=native -Ofast -std=c++14") # -pg for gprof profiler
 set(CMAKE_CXX_FLAGS_DEBUG "-DARMA_EXTRA_DEBUG -g -Wall -std=c++14")
 
 # display info
