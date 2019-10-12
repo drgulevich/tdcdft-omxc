@@ -1,0 +1,19 @@
+# Ignore all
+*
+
+# Unignore all dirs
+!*/
+
+# Ignore build/
+build/*
+
+# Unignore the following
+!*.cpp
+!*.hpp
+!*.h
+!*.c
+!Makefile
+!*.ipynb
+!*.md
+!*.py
+
