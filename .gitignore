@@ -1,0 +1,16 @@
+# Ignore all
+*
+
+# Unignore all dirs
+!*/
+
+# Unignore the following
+!*.cpp
+!*.hpp
+!*.h
+!*.c
+!Makefile
+!*.ipynb
+!*.md
+!*.py
+
