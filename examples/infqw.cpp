@@ -4,9 +4,9 @@
 // -------------------------------------------------------
 #include <iostream>
 #include <chrono>  // timing
-#include "../qwmodels.hpp" // supplementary QuantumWell structs
-#include "../dft.hpp"
-#include "../tddft.hpp"
+#include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
+#include "tdcdft-omxc/dft.hpp"
+#include "tdcdft-omxc/tddft.hpp"
 
 // Important note: for small problem like this on it is best to execute 
 // in serial by switching off OpenMP:

@@ -1,15 +1,19 @@
 # Ignore all
 *
 
-# Unignore all dirs
+# Unignore all dirs except for CMakeFiles
 !*/
+CMakeFiles
+
+# Ignore build/
+build/*
 
 # Unignore the following
 !*.cpp
 !*.hpp
 !*.h
 !*.c
-!Makefile
+!CMakeLists.txt
 !*.ipynb
 !*.md
 !*.py

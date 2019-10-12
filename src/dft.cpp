@@ -2,8 +2,8 @@
 // Copyright (C) 2019 by Dmitry R. Gulevich
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
-#include "dft.hpp"
-#include "xc.hpp"
+#include "tdcdft-omxc/dft.hpp"
+#include "tdcdft-omxc/xc.hpp"
 
 namespace dft {
 

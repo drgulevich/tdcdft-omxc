@@ -5,7 +5,7 @@
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
 #include <armadillo>
-#include "systems.hpp"
+#include "tdcdft-omxc/systems.hpp"
 
 namespace dft {
 
