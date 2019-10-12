@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.1)
 project(tdcdft-omxc)
 
 # flags
@@ -16,11 +16,8 @@ if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
 endif()
 
 include_directories( ./include)
-
 #add_subdirectory(examples)
-
 file(GLOB SOURCES "src/*.cpp") # adding all sources of the kind src/*.cpp 
-
 add_library(tdcdft-omxc STATIC ${SOURCES})
 
 #install(TARGETS tdcdft-omxc

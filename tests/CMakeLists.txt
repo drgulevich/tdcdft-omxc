@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.1)
 project(tests)
-cmake_policy(SET CMP0015 NEW) # set relative path policy
+cmake_policy(SET CMP0015 NEW) # relative path policy, from VERSION 2.8.1
 
 # flags
 set(CMAKE_BUILD_TYPE Release)

@@ -1,11 +1,6 @@
-# cmake version to be used
-cmake_minimum_required(VERSION 2.6)
-
-# project name
+cmake_minimum_required(VERSION 2.8.1)
 project(infqw)
-
-# set relative path policy
-cmake_policy(SET CMP0015 NEW)
+cmake_policy(SET CMP0015 NEW) # relative path policy, from VERSION 2.8.1
 
 # flags
 set(CMAKE_BUILD_TYPE Release)
@@ -23,11 +18,8 @@ if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
 endif()
 
 include_directories( ../include/ )
-
 link_directories( ../ )
-
 add_executable(infqw infqw.cpp)
-
 target_link_libraries(infqw PRIVATE libtdcdft-omxc.a)
 target_link_libraries(infqw PRIVATE armadillo)
 
