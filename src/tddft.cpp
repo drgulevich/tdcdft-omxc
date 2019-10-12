@@ -3,16 +3,16 @@
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
 #include <armadillo>
-#include "xc.hpp"
-#include "dft.hpp"
-#include "tddft.hpp"
+#include "tdcdft-omxc/xc.hpp"
+#include "tdcdft-omxc/dft.hpp"
+#include "tdcdft-omxc/tddft.hpp"
 
 // Kernel versions:
-//#include "kernels/M0.hpp"
-#include "kernels/M1_test1.hpp"
-//#include "kernels/M1.hpp"
-//#include "kernels/M1_new.hpp"
-//#include "kernels/M5_new.hpp"
+//#include "tdcdft-omxc/kernels/M0.hpp"
+#include "tdcdft-omxc/kernels/M1_test1.hpp"
+//#include "tdcdft-omxc/kernels/M1.hpp"
+//#include "tdcdft-omxc/kernels/M1_new.hpp"
+//#include "tdcdft-omxc/kernels/M5_new.hpp"
 
 namespace tddft {
 

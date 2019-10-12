@@ -17,8 +17,8 @@
 		J. Chem. Phys., vol. 145, p. 157101, 2016.
 */
 
+#include "tdcdft-omxc/xc.hpp"
 #include <cmath>
-#include "xc.hpp"
 
 namespace xc {
 

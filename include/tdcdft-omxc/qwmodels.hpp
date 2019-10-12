@@ -10,8 +10,8 @@
 // 		QWell_UV_PRB_1998
 //		DQWell_UV_PRB_1998
 // -------------------------------------------------------
-#include "au.hpp"
-#include "systems.hpp"
+#include "tdcdft-omxc/au.hpp"
+#include "tdcdft-omxc/systems.hpp"
 
 // Quantum well AlGaAs/GaAs/AlGaAs from WU-PRL-2008
 struct QWell_WU_PRL_2008 : QuantumWell {
