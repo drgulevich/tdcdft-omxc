@@ -80,8 +80,8 @@ int main() {
 
 //	FxcALDA fxc;
 //	Fxc_M1_test fxc;
-//	Fxc_M1_D0 fxc;
-	Fxc_M1_DQV fxc;
+	Fxc_M1_D0 fxc;
+//	Fxc_M1_DQV fxc;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
