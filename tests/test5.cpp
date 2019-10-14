@@ -10,32 +10,10 @@
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
 #include "tdcdft-omxc/tools.hpp"
+#include "tdcdft-omxc/fxcmodels.hpp"
 
 using namespace std; 
 using namespace arma; 
-
-struct Fxc_M1_test : xc::FXC {
-
-	Fxc_M1_test() {
-		Mosc=1;
-    	cout << "# Number of oscillators: " << Mosc << endl;
-	}
-
-	cx_mat get_p(vec rho) {
-		cx_double i(0.,1.);
-		cx_mat p(rho.n_elem, Mosc);
-		p.col(0) = (2.-2.*i)*omega_pl(rho);
-		return p;
-	}
-
-	// Returns: n^(2/3) * Cm
-	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
-		mat n23f0finf = xc::get_n23f0finf(n13);
-		cx_mat Coeffs(p.n_rows,p.n_cols);
-		Coeffs.col(0) = conj(p.col(0)) % (n23f0finf.col(1)-n23f0finf.col(0)) / real(p.col(0));
-		return Coeffs;
-	}
-};
 
 TEST_CASE( "Comparison to qwell.GaAs_mesh(100), ksargs = {10,100,0.1}, args = {0.,100.,0.2,3}", "[tddft]" ) {
 

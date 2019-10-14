@@ -10,18 +10,10 @@
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
 #include "tdcdft-omxc/tools.hpp"
+#include "tdcdft-omxc/fxcmodels.hpp"
 
 using namespace std; 
 using namespace arma; 
-
-struct FxcALDA : xc::FXC {
-	FxcALDA() {
-		Mosc=0;
-    	cout << "# ALDA" << endl;
-	}
-	cx_mat get_p(vec rho) {}
-	cx_mat get_n23Coeffs(cx_mat p, vec n13) {}
-};
 
 struct InfQW : QuantumWell {
 
