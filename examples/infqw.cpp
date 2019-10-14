@@ -15,6 +15,15 @@ using namespace arma;
 
 #define OUTPUT
 
+struct FxcALDA : xc::FXC {
+	FxcALDA() {
+		Mosc=0;
+    	cout << "# ALDA" << endl;
+	}
+	cx_mat get_p(vec rho) {}
+	cx_mat get_n23Coeffs(cx_mat p, vec n13) {}
+};
+
 struct Fxc_M1_test : xc::FXC {
 
 	Fxc_M1_test() {
@@ -101,7 +110,8 @@ int main() {
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
 	tddft::Args args = {0., 1000., 0.02, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
 
-	Fxc_M1_test fxc;
+	FxcALDA fxc;
+//	Fxc_M1_test fxc;
 
 	auto start = std::chrono::high_resolution_clock::now();
 

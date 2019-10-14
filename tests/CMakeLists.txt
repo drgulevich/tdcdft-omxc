@@ -17,7 +17,7 @@ if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
 endif()
 
 link_directories( ../ ) # before the target is created
-add_executable(tests main.cpp test1.cpp test2.cpp test3.cpp test4.cpp)
+add_executable(tests main.cpp test1.cpp test2.cpp test3.cpp test4.cpp test5.cpp)
 target_include_directories(tests PRIVATE ../include/ )
 target_link_libraries(tests PRIVATE libtdcdft-omxc.a)
 target_link_libraries(tests PRIVATE armadillo)

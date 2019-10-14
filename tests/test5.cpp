@@ -14,56 +14,36 @@
 using namespace std; 
 using namespace arma; 
 
-struct FxcALDA : xc::FXC {
-	FxcALDA() {
-		Mosc=0;
-    	cout << "# ALDA" << endl;
-	}
-	cx_mat get_p(vec rho) {}
-	cx_mat get_n23Coeffs(cx_mat p, vec n13) {}
-};
+struct Fxc_M1_test : xc::FXC {
 
-struct InfQW : QuantumWell {
-
-	const double eps=13.0;  // dielectric constant, from WU-PRL-2005
-	const double meff=0.067; // effective mass in units m0, from WU-PRL-2005
-	au::Effau effau = au::Effau(eps,meff); // set up effective atomic units
-	const double W = effau.to_au(400.,"Angstrom"); // from WU-PRL-2005
-	const double Ewell=257.6/effau.Eh; // Quantum well depth, from WU-PRL-2005
-	double Efield = effau.to_au(0.,"mV/nm");
-	InfQW() {
-		cout << "# GaAs quantum well with infinite walls" << endl;
-		ns=1.0e11*effau.a0cm*effau.a0cm; // Sheet density, from WU-PRL-2005
+	Fxc_M1_test() {
+		Mosc=1;
+    	cout << "# Number of oscillators: " << Mosc << endl;
 	}
 
-	// Quantum well potential, including electric field
-	double Vext(double z) {
-		return -Efield*z;
+	cx_mat get_p(vec rho) {
+		cx_double i(0.,1.);
+		cx_mat p(rho.n_elem, Mosc);
+		p.col(0) = (2.-2.*i)*omega_pl(rho);
+		return p;
 	}
 
-	// Seed electron density for DFT calculations (initial guess)
-	double rho_seed(double z) {
-		double cosz = cos(M_PI*z/W);
-		return 2.*(ns/W)*cosz*cosz;
-	}
-
-	// Mesh generator
-	Mesh<QuantumWell> mesh(int M) {
-		double dz = W/(M+1);
-		Mesh<QuantumWell> mesh(M, dz);
-		return mesh;
+	// Returns: n^(2/3) * Cm
+	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
+		mat n23f0finf = xc::get_n23f0finf(n13);
+		cx_mat Coeffs(p.n_rows,p.n_cols);
+		Coeffs.col(0) = conj(p.col(0)) % (n23f0finf.col(1)-n23f0finf.col(0)) / real(p.col(0));
+		return Coeffs;
 	}
 };
 
+TEST_CASE( "Comparison to qwell.GaAs_mesh(100), ksargs = {10,100,0.1}, args = {0.,100.,0.2,3}", "[tddft]" ) {
 
-
-TEST_CASE( "ALDA test", "[tddft]" ) {
-
-	cout << "Test 4: " << endl;
+	cout << "Test 5: " << endl;
 	recommend_num_threads(1);
 
-	InfQW qwell;
-	Mesh<QuantumWell> mesh = qwell.mesh(100);
+	QWell_WU_PRL_2005 qwell;
+	Mesh<QuantumWell> mesh = qwell.GaAs_mesh(100);
 	dft::KsGs ks;
 	dft::KsArgs ksargs = {10,100,0.1}; // { number of bands, iterations, smoothness }
 
@@ -71,9 +51,9 @@ TEST_CASE( "ALDA test", "[tddft]" ) {
 	ks = dft::Ks(qwell, mesh, ksargs); // Solve KS equation 
 
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
-	tddft::Args args = {0.,500.,0.05,3};
+	tddft::Args args = {0.,100.,0.2,3};
 
-	FxcALDA fxc;
+	Fxc_M1_test fxc;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
@@ -94,7 +74,9 @@ TEST_CASE( "ALDA test", "[tddft]" ) {
 		result(i) = tdks.dipole(npoints-1-i);
 	}
 
-    vec reference = {0.0117494,0.0103206,0.00886947}; // EXP_ORDER 3
+	// Comment: these values (obtained with timestep 0.2) are not converged, use for test only
+    //vec reference = {-0.0150219,-0.0148807,-0.0141548}; // EXP_ORDER not defined (i.e. full exp is used)
+    vec reference = {-0.0150072,-0.0148585,-0.014131}; // EXP_ORDER 3
 
    	REQUIRE( result(0) == Approx( reference(0) ).epsilon(0.001) );
    	REQUIRE( result(1) == Approx( reference(1) ).epsilon(0.001) );
