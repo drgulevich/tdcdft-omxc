@@ -9,12 +9,6 @@
 #include "tdcdft-omxc/tddft.hpp"
 #include "tdcdft-omxc/tools.hpp"
 
-// Important note: for small problem like this on it is best to execute 
-// in serial by switching off OpenMP:
-// 		$ export OMP_NUM_THREADS=1
-// Check:
-// 		$ echo $OMP_NUM_THREADS
-
 using namespace std; 
 using namespace arma; 
 
