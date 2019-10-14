@@ -78,7 +78,7 @@ int main() {
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
 	tddft::Args args = {0., 500., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
 
-//	FxcALDA fxc;
+//	Fxc_ALDA fxc;
 //	Fxc_M1_test fxc;
 	Fxc_M1_D0 fxc;
 //	Fxc_M1_DQV fxc;

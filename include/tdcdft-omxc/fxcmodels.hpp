@@ -4,10 +4,16 @@
 // Copyright (C) 2019 by Dmitry R. Gulevich
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
+// fxc implementations:
+//		Fxc_ALDA
+//		Fxc_M1_test
+// 		Fxc_M1_D0
+//		Fxc_M1_DQV
+// -------------------------------------------------------
 #include "tdcdft-omxc/xc.hpp"
 
-struct FxcALDA : xc::FXC {
-	FxcALDA() {
+struct Fxc_ALDA : xc::FXC {
+	Fxc_ALDA() {
 		Mosc=0;
     	cout << "# ALDA" << endl;
 	}
@@ -39,7 +45,6 @@ struct Fxc_M1_test : xc::FXC {
 };
 
 
-//#define IMDFXC_ON // ImDfxc from QV
 
 struct Fxc_M1_D0 : xc::FXC {
 

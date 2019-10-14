@@ -65,7 +65,7 @@ TEST_CASE( "ALDA test", "[tddft]" ) {
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
 	tddft::Args args = {0.,500.,0.05,3};
 
-	FxcALDA fxc;
+	Fxc_ALDA fxc;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
