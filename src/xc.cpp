@@ -118,12 +118,12 @@ namespace xc {
 	}
 
 
-	Fxc get_n23fxc(vec cr) {
-		Fxc n23fxc(cr.n_elem);
+	mat get_n23f0finf(vec cr) {
+		mat n23f0finf(cr.n_elem,2);
 		for(uword m=0;m<cr.n_elem;++m) {
 			// exchange
-			n23fxc.f0(m) = 4.*ax/9.;
-			n23fxc.finf(m) = 4.*ax/15.;
+			n23f0finf(m,0) = 4.*ax/9.; // f0
+			n23f0finf(m,1) = 4.*ax/15.; // finf
 	
 			// correlation
 			double cr1 = cr(m);
@@ -131,38 +131,17 @@ namespace xc {
 			double cr3 = cr1*cr2; // rho(m)
 			double arg = 1. + B1*cr1 + B2*cr2;
 			//fxc.crho(m) = cr1;
-			n23fxc.f0(m) += ac*(4.*B1 + (3.*B1*B1 + 10.*B2)*cr1 + 10.*B1*B2*cr2 + 6.*B2*B2*cr3)/(9.*arg*arg);
-			n23fxc.finf(m) += 2.*ac*(13.*(B1 + 2.*B2*cr1)/arg - 11.*log(arg)/cr1)/15.;
+			n23f0finf(m,0) += ac*(4.*B1 + (3.*B1*B1 + 10.*B2)*cr1 + 10.*B1*B2*cr2 + 6.*B2*B2*cr3)/(9.*arg*arg); // f0
+			n23f0finf(m,1) += 2.*ac*(13.*(B1 + 2.*B2*cr1)/arg - 11.*log(arg)/cr1)/15.; // finf
 		}
-		return n23fxc;
+		return n23f0finf;
 	}
 
 
-	vec omega_pl(vec rho) {
+	/*vec omega_pl(vec rho) {
 		static const double factor = sqrt(4.*M_PI);
 		return factor*sqrt(rho);
-	}
-
-/*
-class Fxc {
-	public:
-		Fxc();
-		std::vector<double> fxc0(std::vector<double> rho);
-
-		int npoles;
-    	void omega_pl(double *rho, double *result, int dim);
-};
-*/
-
-/*	struct Kernel_values {
-		Kernel_values(uword n_rows, uword n_cols) {
-			p.set_size(n_rows,n_cols);
-			n23Coeffs.set_size(n_rows,n_cols);
-		}
-		cx_mat p;
-		cx_mat n23Coeffs;
-
-	};*/
+	}*/
 
 } // end of xc namespace
 

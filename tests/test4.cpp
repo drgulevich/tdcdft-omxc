@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>  // timing
 #include "catch2/catch.hpp" // testing framework
+#include "tdcdft-omxc/xc.hpp"
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
@@ -12,6 +13,29 @@
 
 using namespace std; 
 using namespace arma; 
+
+struct Fxc_M1_test : xc::FXC {
+
+	Fxc_M1_test() {
+		Mosc=1;
+    	cout << "# Number of oscillators: " << Mosc << endl;
+	}
+
+	cx_mat get_p(vec rho) {
+		cx_double i(0.,1.);
+		cx_mat p(rho.n_elem, Mosc);
+		p.col(0) = (2.-2.*i)*omega_pl(rho);
+		return p;
+	}
+
+	// Returns: n^(2/3) * Cm
+	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
+		mat n23f0finf = xc::get_n23f0finf(n13);
+		cx_mat Coeffs(p.n_rows,p.n_cols);
+		Coeffs.col(0) = conj(p.col(0)) % (n23f0finf.col(1)-n23f0finf.col(0)) / real(p.col(0));
+		return Coeffs;
+	}
+};
 
 TEST_CASE( "Comparison to qwell.GaAs_mesh(100), ksargs = {10,100,0.1}, args = {0.,100.,0.2,3}", "[tddft]" ) {
 
@@ -29,9 +53,11 @@ TEST_CASE( "Comparison to qwell.GaAs_mesh(100), ksargs = {10,100,0.1}, args = {0
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
 	tddft::Args args = {0.,100.,0.2,3};
 
+	Fxc_M1_test fxc;
+
 	auto start = std::chrono::high_resolution_clock::now();
 
-	tddft::Result tdks = tddft::Tdks(qwell, mesh, ks, args);
+	tddft::Result tdks = tddft::Tdks(qwell, mesh, fxc, ks, args);
 
 	auto finish = std::chrono::high_resolution_clock::now();
 

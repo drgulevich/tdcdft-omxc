@@ -7,14 +7,6 @@
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
 
-// Kernel versions:
-//#include "tdcdft-omxc/kernels/M0.hpp"
-//#include "tdcdft-omxc/kernels/M1_test1.hpp"
-//#include "tdcdft-omxc/kernels/M1.hpp"
-//#include "tdcdft-omxc/kernels/M1_new.hpp"
-//#include "tdcdft-omxc/kernels/M5_new.hpp"
-
-#define ALDAM 1 //  DEBUG
 #define EXP_ORDER 3
 
 namespace tddft {
@@ -126,46 +118,26 @@ double get_dipole(Mesh<QuantumWell> &mesh, vec &rho) {
 
 Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs &ks, Args args) {
 
-#if defined(ALDAM) && ALDAM>0
-    cout << "# ALDA+M" << endl;
-    cout << "# Number of poles: " << ALDAM << endl;
-#elif defined(ALDAM) && ALDAM==0
-    cout << "# ALDA" << endl;
-#else
-    cout << "# Hartree" << endl; 
-    cout << "# Warning! Ensure that Hartree is used in static Veff. Continuing." << endl;
-#endif
-
 	vec Vext(mesh.M);
 	for(uword m=0; m<mesh.M; ++m)
 		Vext(m) = qwell.Vext(mesh.z(m));
 
-#if defined(ALDAM) && ALDAM>0
     struct State {
 	    State(QuantumWell &qwell, dft::KsGs &ks, uword ncols) {
-			gradv = zeros<vec>(ks.orbs.n_rows);
-			memory = zeros<cx_mat>(ks.orbs.n_rows,ncols);
 	    	Hmatrix = diagmat(ks.ens);
 	    	Cpsi = eye<cx_mat>(ks.ens.n_elem,qwell.Nocc);
-	    }
-		vec gradv;
-	    cx_mat memory;
-	    cx_mat Cpsi;
-	    mat Hmatrix;
-    };
-	State previous(qwell,ks,ALDAM);
-#else
-    struct State {
-	    State(QuantumWell &qwell, dft::KsGs &ks) {
-	    	Hmatrix = diagmat(ks.ens);
-	    	Cpsi = eye<cx_mat>(ks.ens.n_elem,qwell.Nocc);
+			if(ncols>0) {
+				gradv = zeros<vec>(ks.orbs.n_rows);
+				memory = zeros<cx_mat>(ks.orbs.n_rows,ncols);
+			}
 	    }
 	    cx_mat Cpsi;
 	    mat Hmatrix;
+		vec gradv; // not needed for ALDA and Hartree
+	    cx_mat memory; // not needed for ALDA and Hartree
     };
-    State previous(qwell,ks);
-#endif
 
+	State previous(qwell, ks, fxc.Mosc);
 	State current = previous;
 
 	std::vector<double> t_array;
@@ -205,28 +177,31 @@ Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs
 
 			vec VHartree = dft::get_VHartree(mesh,rho,qwell.ns);
 			vec dV = Vext + VHartree - ks.Veff;
-#ifdef ALDAM
-			vec n13 = pow(rho,1/3.);
-			vec VxcLDA = xc::get_VxcLDA(n13);
-			dV += VxcLDA;
-#endif
-#if defined(ALDAM) && ALDAM>0
-			cx_mat gradpsi = grad(mesh,psi);
 
-			// Calculate current
-			vec J = zeros(mesh.M);
-			for(uword m=0;m<qwell.Nocc;++m)
-				J += weights(m)*imag(conj(psi.col(m))%gradpsi.col(m));
-			vec vfield = J/rho;
+			if(fxc.Mosc>=0) { // ALDA and beyond 
+				vec n13 = pow(rho,1/3.);
+				vec VxcLDA = xc::get_VxcLDA(n13);
+				dV += VxcLDA;
 
-			current.gradv = grad(mesh, vfield);
-			cx_mat p = fxc.get_p(rho);
-			cx_mat n23Coeffs = fxc.get_n23Coeffs(p, n13);
-			current.memory = get_memory(p, previous.memory, previous.gradv, current.gradv, args.dt);
-			vec VxcM = get_VxcM(mesh, current.memory, n13, n23Coeffs);
+				if(fxc.Mosc>0) { // nonadiabatic
+					cx_mat gradpsi = grad(mesh,psi);
 
-			dV += VxcM;
-#endif
+					// Calculate current
+					vec J = zeros(mesh.M);
+					for(uword m=0;m<qwell.Nocc;++m)
+						J += weights(m)*imag(conj(psi.col(m))%gradpsi.col(m));
+					vec vfield = J/rho;
+
+					current.gradv = grad(mesh, vfield);
+					cx_mat p = fxc.get_p(rho);
+					cx_mat n23Coeffs = fxc.get_n23Coeffs(p, n13);
+					current.memory = get_memory(p, previous.memory, previous.gradv, current.gradv, args.dt);
+					vec VxcM = get_VxcM(mesh, current.memory, n13, n23Coeffs);
+
+					dV += VxcM;
+				}
+			}
+
 			current.Hmatrix = to_ksbasis(mesh, ks, dV);
 			current.Hmatrix.diag() += ks.ens;
 		}
