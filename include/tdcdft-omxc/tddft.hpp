@@ -6,6 +6,7 @@
 // -------------------------------------------------------
 #include <armadillo>
 #include "tdcdft-omxc/systems.hpp"
+#include "tdcdft-omxc/xc.hpp"
 
 namespace tddft {
 
@@ -24,7 +25,7 @@ namespace tddft {
 	};
 
 	// Declarations for public functions
-	Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, dft::KsGs &ks, Args args);
+	Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs &ks, Args args);
 
 } // end of namespace dft
 

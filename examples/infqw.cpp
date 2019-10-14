@@ -4,15 +4,34 @@
 // -------------------------------------------------------
 #include <iostream>
 #include <chrono>  // timing
-#include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
+#include "tdcdft-omxc/xc.hpp"
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
 #include "tdcdft-omxc/tools.hpp"
+#include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 
 using namespace std; 
 using namespace arma; 
 
-//#define OUTPUT
+#define OUTPUT
+
+struct Fxc_M1_test : xc::FXC {
+
+	cx_mat get_p(vec rho) {
+		cx_double i(0.,1.);
+		cx_mat p(rho.n_elem, 1);
+		p.col(0) = (2.-2.*i)*xc::omega_pl(rho);
+		return p;
+	}
+
+	// Returns: n^(2/3) * Cm
+	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
+		xc::Fxc n23fxc = xc::get_n23fxc(n13);
+		cx_mat Coeffs(p.n_rows,p.n_cols);
+		Coeffs.col(0) = conj(p.col(0)) % (n23fxc.finf-n23fxc.f0) / real(p.col(0));
+		return Coeffs;
+	}
+};
 
 struct InfQW : QuantumWell {
 
@@ -75,11 +94,13 @@ int main() {
 	cout << "# ns: " << qwell.ns << endl;
 
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
-	tddft::Args args = {0., 100., 0.02, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
+	tddft::Args args = {0., 1000., 0.02, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
+
+	Fxc_M1_test1 fxc;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	tddft::Result tdks = tddft::Tdks(qwell, mesh, ks, args);
+	tddft::Result tdks = tddft::Tdks(qwell, mesh, fxc, ks, args);
 
 	auto finish = std::chrono::high_resolution_clock::now();
 

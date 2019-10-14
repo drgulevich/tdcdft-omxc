@@ -154,5 +154,15 @@ class Fxc {
 };
 */
 
+/*	struct Kernel_values {
+		Kernel_values(uword n_rows, uword n_cols) {
+			p.set_size(n_rows,n_cols);
+			n23Coeffs.set_size(n_rows,n_cols);
+		}
+		cx_mat p;
+		cx_mat n23Coeffs;
+
+	};*/
+
 } // end of xc namespace
 

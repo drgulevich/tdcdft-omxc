@@ -9,10 +9,13 @@
 
 // Kernel versions:
 //#include "tdcdft-omxc/kernels/M0.hpp"
-#include "tdcdft-omxc/kernels/M1_test1.hpp"
+//#include "tdcdft-omxc/kernels/M1_test1.hpp"
 //#include "tdcdft-omxc/kernels/M1.hpp"
 //#include "tdcdft-omxc/kernels/M1_new.hpp"
 //#include "tdcdft-omxc/kernels/M5_new.hpp"
+
+#define ALDAM 1 //  DEBUG
+#define EXP_ORDER 3
 
 namespace tddft {
 
@@ -59,20 +62,6 @@ vec grad(Mesh<QuantumWell> &mesh, vec &v) {
 }
 
 
-#if defined(ALDAM) && ALDAM>0
-cx_mat get_p(vec rho) {
-	uword ncols = ALDAM;
-	cx_mat p(rho.n_elem, ncols);
-
-	p.col(0) = p1(rho);
-	for(uword m=1;m<ncols;++m)
-		p.col(m) = 0.1*p.col(m-1); // some test values
-	return p;
-}
-#endif
-
-int exp_order=1;
-
 cx_mat get_memory(cx_mat &p, cx_mat &previous_memory, vec &previous_gradv, vec &gradv, double dt) {
 
 	uword nrows = previous_memory.n_rows;
@@ -117,9 +106,9 @@ cx_mat get_memory(cx_mat &p, cx_mat &previous_memory, vec &previous_gradv, vec &
 }
 
 
-mat get_VxcM(Mesh<QuantumWell> &mesh, cx_mat &memory, vec &n13, cx_mat &p) {
+//mat get_VxcM(Mesh<QuantumWell> &mesh, cx_mat &memory, vec &n13, cx_mat &p) {
+mat get_VxcM(Mesh<QuantumWell> &mesh, cx_mat &memory, vec &n13, cx_mat &n23Coeffs) {
 
-	cx_mat n23Coeffs = get_n23Coeffs(p, n13);
 	vec n23sxc = real(n23Coeffs.col(0) % memory.col(0));
 	for(uword m=1;m<n23Coeffs.n_cols;++m)
 		n23sxc += real(n23Coeffs.col(m) % memory.col(m));
@@ -135,7 +124,7 @@ double get_dipole(Mesh<QuantumWell> &mesh, vec &rho) {
 }
 
 
-Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, dft::KsGs &ks, Args args) {
+Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs &ks, Args args) {
 
 #if defined(ALDAM) && ALDAM>0
     cout << "# ALDA+M" << endl;
@@ -230,12 +219,12 @@ Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, dft::KsGs &ks, Args arg
 				J += weights(m)*imag(conj(psi.col(m))%gradpsi.col(m));
 			vec vfield = J/rho;
 
- 			//vec vfield = qwell.ns*imag(conj(psi)%gradpsi)/rho;
-
 			current.gradv = grad(mesh, vfield);
-			cx_mat p = get_p(rho);
+			cx_mat p = fxc.get_p(rho);
+			cx_mat n23Coeffs = fxc.get_n23Coeffs(p, n13);
 			current.memory = get_memory(p, previous.memory, previous.gradv, current.gradv, args.dt);
-			vec VxcM = get_VxcM(mesh, current.memory, n13, p);
+			vec VxcM = get_VxcM(mesh, current.memory, n13, n23Coeffs);
+
 			dV += VxcM;
 #endif
 			current.Hmatrix = to_ksbasis(mesh, ks, dV);
