@@ -7,6 +7,7 @@
 #include "catch2/catch.hpp" // testing framework
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 #include "tdcdft-omxc/dft.hpp"
+#include "tdcdft-omxc/tools.hpp"
 
 // Important note: for small problem like this on it is best to execute 
 // in serial by switching off OpenMP:
@@ -20,6 +21,7 @@ using namespace arma;
 TEST_CASE( "Comparison to qwell.GaAs_mesh(100), ksargs = {10,100,0.1} at field 0.5 mV/nm", "[dft]" ) {
 
 	cout << "Test 1: " << endl;
+	recommend_num_threads(1);
 
 	QWell_WU_PRL_2005 qwell;
 	Mesh<QuantumWell> mesh = qwell.GaAs_mesh(100);

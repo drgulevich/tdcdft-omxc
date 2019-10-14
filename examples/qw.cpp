@@ -7,6 +7,7 @@
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
+#include "tdcdft-omxc/tools.hpp"
 
 // Important note: for small problem like this on it is best to execute 
 // in serial by switching off OpenMP:
@@ -20,6 +21,8 @@ using namespace arma;
 #define OUTPUT
 
 int main() {
+
+	recommend_num_threads(1);
 
 	QWell_WU_PRL_2008 qwell;
 	Mesh<QuantumWell> mesh = qwell.GaAs_mesh(100);

@@ -7,6 +7,7 @@
 #include "catch2/catch.hpp" // testing framework
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 #include "tdcdft-omxc/dft.hpp"
+#include "tdcdft-omxc/tools.hpp"
 
 // Important note: for small problem like this on it is best to execute 
 // in serial by switching off OpenMP:
@@ -20,6 +21,7 @@ using namespace arma;
 TEST_CASE( "Comparison to the Ullrich-Vignale-PRB-1998 result E01=8.18 meV for single quantum well", "[dft]" ) {
 
 	cout << "Test 2: " << endl;
+	recommend_num_threads(1);
 
 	QWell_UV_PRB_1998 qwell;
 	Mesh<QuantumWell> mesh = qwell.GaAs_mesh(100);

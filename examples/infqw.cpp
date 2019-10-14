@@ -7,6 +7,7 @@
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
+#include "tdcdft-omxc/tools.hpp"
 
 // Important note: for small problem like this on it is best to execute 
 // in serial by switching off OpenMP:
@@ -21,7 +22,7 @@
 using namespace std; 
 using namespace arma; 
 
-#define OUTPUT
+//#define OUTPUT
 
 struct InfQW : QuantumWell {
 
@@ -56,6 +57,8 @@ struct InfQW : QuantumWell {
 };
 
 int main() {
+
+	recommend_num_threads(1);
 
 	InfQW qwell;
 	Mesh<QuantumWell> mesh = qwell.mesh(100);
