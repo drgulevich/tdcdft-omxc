@@ -4,10 +4,11 @@
 // -------------------------------------------------------
 #include <iostream>
 #include <chrono>  // timing
-#include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
 #include "tdcdft-omxc/tools.hpp"
+#include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
+#include "tdcdft-omxc/fxcmodels.hpp" // supplementary fxc structs
 
 using namespace std; 
 using namespace arma; 
@@ -45,9 +46,11 @@ int main() {
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
 	tddft::Args args = {0., 50., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
 
+	Fxc_M1_D0 fxc;
+
 	auto start = std::chrono::high_resolution_clock::now();
 
-	tddft::Result tdks = tddft::Tdks(qwell, mesh, ks, args);
+	tddft::Result tdks = tddft::Tdks(qwell, mesh, fxc, ks, args);
 
 	auto finish = std::chrono::high_resolution_clock::now();
 

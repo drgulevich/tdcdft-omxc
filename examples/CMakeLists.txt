@@ -19,9 +19,14 @@ endif()
 
 include_directories( ../include/ ) # applies to all targets below
 link_directories( ../ ) # before the target is created
+
 add_executable(infqw infqw.cpp)
 target_link_libraries(infqw PRIVATE libtdcdft-omxc.a)
 target_link_libraries(infqw PRIVATE armadillo)
+
+add_executable(qw qw.cpp)
+target_link_libraries(qw PRIVATE libtdcdft-omxc.a)
+target_link_libraries(qw PRIVATE armadillo)
 
 add_custom_target(distclean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean

@@ -47,6 +47,30 @@ struct InfQW : QuantumWell {
 	}
 };
 
+struct Fxc_custom : xc::FXC {
+
+	Fxc_custom() {
+		Mosc=1;
+    	cout << "# Number of oscillators: " << Mosc << endl;
+	}
+
+	cx_mat get_p(vec rho) {
+		cx_double i(0.,1.);
+		cx_mat p(rho.n_elem, Mosc);
+		p.col(0) = (2.-2.*i)*omega_pl(rho);
+		return p;
+	}
+
+	// Returns: n^(2/3) * Cm
+	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
+		mat n23f0finf = xc::get_n23f0finf(n13);
+		cx_mat Coeffs(p.n_rows,p.n_cols);
+		Coeffs.col(0) = conj(p.col(0)) % (n23f0finf.col(1)-n23f0finf.col(0)) / real(p.col(0));
+		return Coeffs;
+	}
+};
+
+
 int main() {
 
 	recommend_num_threads(1);
@@ -78,9 +102,10 @@ int main() {
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
 	tddft::Args args = {0., 500., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
 
+	Fxc_custom fxc;
 //	Fxc_ALDA fxc;
 //	Fxc_M1_test fxc;
-	Fxc_M1_D0 fxc;
+//	Fxc_M1_D0 fxc;
 //	Fxc_M1_DQV fxc;
 
 	auto start = std::chrono::high_resolution_clock::now();
