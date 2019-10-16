@@ -13,7 +13,7 @@
 #include "tdcdft-omxc/xc.hpp"
 #include <armadillo>
 
-//using namespace xc
+using namespace arma;
 
 /**
 * fxc for ALDA
@@ -40,7 +40,7 @@ struct Fxc_M1_test : xc::Omxc {
 	cx_mat get_p(vec rho) {
 		cx_double i(0.,1.);
 		cx_mat p(rho.n_elem, Mosc);
-		p.col(0) = (2.-2.*i)*omega_pl(rho);
+		p.col(0) = (2.-2.*i)*xc::omega_pl(rho);
 		return p;
 	}
 
@@ -73,7 +73,7 @@ struct Fxc_M1_D0 : xc::Omxc {
 
 	cx_mat get_p(vec rho) {
 		cx_mat p(rho.n_elem, Mosc);
-		p.col(0) = (rep1+imp1*i)*omega_pl(rho);
+		p.col(0) = (rep1+imp1*i)*xc::omega_pl(rho);
 		return p;
 	}
 
@@ -106,7 +106,7 @@ struct Fxc_M1_DQV : xc::Omxc {
 
 	cx_mat get_p(vec rho) {
 		cx_mat p(rho.n_elem, Mosc);
-		p.col(0) = (rep1+imp1*i)*omega_pl(rho);
+		p.col(0) = (rep1+imp1*i)*xc::omega_pl(rho);
 		return p;
 	}
 

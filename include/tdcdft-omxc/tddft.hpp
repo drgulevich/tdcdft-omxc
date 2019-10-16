@@ -10,6 +10,8 @@
 #include "tdcdft-omxc/dft.hpp"
 #include <armadillo>
 
+using namespace arma;
+
 namespace tddft {
 
 	/** 

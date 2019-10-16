@@ -4,6 +4,9 @@
 // Copyright (C) 2019 by Dmitry R. Gulevich
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
+#include <armadillo>
+
+using namespace arma;
 
 /**
 * Electron system (an abstract class used by derived classes).

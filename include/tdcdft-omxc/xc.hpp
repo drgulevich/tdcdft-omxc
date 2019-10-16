@@ -66,9 +66,20 @@ namespace xc {
 	mat get_n23f0finf(vec cr /** Cubic root of the electron density, pow(rho,1/3.) */);
 
 	/**
+	* Eq.(16) of Z. Qian and G. Vignale, Phys. Rev. B65, 235121 (2002).
+	*/
+	vec S3L(vec lam);
+     
+	/**
+	* Returns n^(2/3) * (d/domega)Imfxc(n,0), see Ref. Z. Qian and G. Vignale, Phys. Rev. B65, 235121 (2002).
+	*/
+	vec get_n23ImDfxc(vec rho, vec n13);
+
+	/**
 	* Plasma frequency of 3D electron gas
 	*/
 	vec omega_pl(vec rho /** Electron density */);
+
 }
 
 #endif // XC_HEADER
