@@ -14,7 +14,9 @@ test:
   
 pages:
   script:
-  - doxygen docs/Doxyfile
+  - cd docs
+  - doxygen Doxyfile
+  - cd ..
   - mv docs/html/ public/
   artifacts:
     paths:
