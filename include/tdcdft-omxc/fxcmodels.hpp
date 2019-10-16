@@ -11,8 +11,14 @@
 //		Fxc_M1_DQV
 // -------------------------------------------------------
 #include "tdcdft-omxc/xc.hpp"
+#include <armadillo>
 
-struct Fxc_ALDA : xc::FXC {
+//using namespace xc
+
+/**
+* fxc for ALDA
+*/
+struct Fxc_ALDA : xc::Omxc {
 	Fxc_ALDA() {
 		Mosc=0;
     	cout << "# ALDA" << endl;
@@ -21,7 +27,10 @@ struct Fxc_ALDA : xc::FXC {
 	cx_mat get_n23Coeffs(cx_mat p, vec n13) {}
 };
 
-struct Fxc_M1_test : xc::FXC {
+/**
+* fxc with M=1, used in one of the tests
+*/
+struct Fxc_M1_test : xc::Omxc {
 
 	Fxc_M1_test() {
 		Mosc=1;
@@ -45,8 +54,10 @@ struct Fxc_M1_test : xc::FXC {
 };
 
 
-
-struct Fxc_M1_D0 : xc::FXC {
+/**
+* fxc with M=1, used to produce results in Fig. 2 of D. R. Gulevich et al. PRB Rapid Communications (2019).
+*/
+struct Fxc_M1_D0 : xc::Omxc {
 
 	Fxc_M1_D0() {
 		Mosc=1;
@@ -76,7 +87,10 @@ struct Fxc_M1_D0 : xc::FXC {
 
 };
 
-struct Fxc_M1_DQV : xc::FXC {
+/**
+* fxc with M=1 with the tangent of Im(fxc) at omega=0 given by Eq.(16) of Z. Qian and G. Vignale, Phys. Rev. B65, 235121 (2002).
+*/
+struct Fxc_M1_DQV : xc::Omxc {
 
 	Fxc_M1_DQV() {
 		Mosc=1;
@@ -96,35 +110,12 @@ struct Fxc_M1_DQV : xc::FXC {
 		return p;
 	}
 
-	// QV Eq.(16)
-	vec S3L(vec lam) {
-		vec result(lam.n_elem);
-		double factor = -1./(45.*M_PI);
-		for(uword m=0;m<lam.n_elem;++m) {
-			double part1 = 5.-(lam[m]+5./lam[m])*atan(lam[m]);
-			double part2 = -(2./lam[m])*asin(lam[m]/sqrt(1.+lam[m]*lam[m]));
-			double arg = 1./(lam[m]*sqrt(2.+lam[m]*lam[m]));
-			double part3 = arg*(M_PI - 2.*atan(arg));
-			result[m] = factor*(part1+part2+part3);
-		}
-		return result;
-	}
-
-	const double factorkf = cbrt(3.*M_PI*M_PI); // kf = factorkf*n13;
-    
-	// Returns: n^(2/3) * (d/domega)Imfxc(n,0)
-	vec get_n23ImDfxc(vec rho, vec n13) {
-		vec kf = factorkf*n13;
-		vec lam = sqrt(M_PI*kf); // 2kf/ks    
-		return -factorkf*S3L(lam)/(M_PI*M_PI*rho);
-	}
-
 	// Returns: n^(2/3) * Cm
 	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
 		mat n23fxc = xc::get_n23f0finf(n13);
 		cx_mat Coeffs(p.n_rows,p.n_cols);
 		vec rho = n13 % n13 % n13; // can be imporved by passing rho directly
-		vec n23ImDfxc = get_n23ImDfxc(rho, n13);
+		vec n23ImDfxc = xc::get_n23ImDfxc(rho, n13);
 		Coeffs.col(0) = p.col(0) % (n23fxc.col(1) - n23fxc.col(0) - i*conj(p.col(0))%n23ImDfxc ) / real(p.col(0));
 		return Coeffs;
 	}

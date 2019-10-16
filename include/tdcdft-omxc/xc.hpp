@@ -10,28 +10,65 @@ using namespace arma;
 
 namespace xc {
 
-	struct FXC {
+	/**
+	* An abstract class for xc kernels in the OMXC form
+	*/
+	struct Omxc {
 		uword Mosc;
-		vec omega_pl(vec rho) {
-			static const double factor = sqrt(4.*M_PI);
-			return factor*sqrt(rho);
-		}
 		virtual cx_mat get_p(vec rho) = 0; // pure virtual
 		virtual cx_mat get_n23Coeffs(cx_mat p, vec n13) = 0; // pure virtual
-		virtual ~FXC() {} // virtual destructor
+		virtual ~Omxc() {} // virtual destructor
 	};
 
-	// Functions of cr=pow(rho,1/3.):
-	vec get_ex(vec cr);
-	vec get_ec(vec cr);
-	vec get_exc(vec cr);
-	vec get_VxcLDA(vec cr); // passing cr to VxcLDA is faster than passing rho
-	vec get_n23f0(vec cr);
-	vec get_n23finf(vec cr);
-	mat get_n23f0finf(vec cr);
+	/**
+	* Exchange energy per particle.
+	* See, e.g. Eq.(34) in C. A. Ullrich and Z.-H. Yang, A Brief Compendium of Time-Dependent Density Functional Theory, Braz. J. Phys. 44, 154 (2014).
+	*/
+	vec get_ex(vec cr /** Cubic root of the electron density, pow(rho,1/3.) */);
 
-	// Functions of rho
-	vec omega_pl(vec rho);
+	/**
+	* Correlation energy per particle for spin-unpolarized case in Chachiyo-Karasiev parametrization:
+	* T. Chachiyo, "Communication: Simple and accurate uniform electron gas correlation energy for the full range of densities", 
+	* J. Chem. Phys. 145, 021101 (2016).
+	* V. V. Karasiev, "Comment on ‘Communication: Simple and accurate uniform electron gas correlation energy for the full range of densities",
+	* J. Chem. Phys. 145, 157101 (2016).
+	*/
+	vec get_ec(vec cr /** Cubic root of the electron density, pow(rho,1/3.) */);
+
+	/**
+	* Exchange-correlation energy per particle. A sum of get_ex(vec cr) and get_ec(vec cr) defined above.
+	*/
+	vec get_exc(vec cr /** Cubic root of the electron density, pow(rho,1/3.) */);
+
+	/**
+	* LDA exchange-correlation potential.
+	* Note, the cubic root of the electron density cr=pow(rho,1/3.) is passed as an argument due to performance considerations.
+	*/
+	vec get_VxcLDA(vec cr /** Cubic root of the electron density, pow(rho,1/3.) */);
+
+	/**
+	* Zero-frequency limit of longitudinal fxc.
+	* Returns n^(2/3) * f0, where f0 = d^2(n*exc(n))/dn^2 given by Eq.(i) in Ref. E. K. U. Gross and W. Kohn, Phys. Rev. Lett. 55, 2850 (1985).
+	*/
+	vec get_n23f0(vec cr /** Cubic root of the electron density, pow(rho,1/3.) */);
+
+	/**
+	* Infinite-frequency limit of longitudinal fxc.
+	* Returns n^(2/3) * finf, where finf is given by Eq.(2) in Ref. N. Iwamoto and E. K. U. Gross, Phys. Rev. B 35, 3003 (1987).
+	*/
+	vec get_n23finf(vec cr /** Cubic root of the electron density, pow(rho,1/3.) */);
+
+	/**
+	* Zero- and infinite-frequency limits of longitudinal fxc calculated simultaneously. 
+	* Column (0) of the result coincides with get_n23f0(vec cr) defined above.
+	* Column (1) of the result coincides with get_n23finf(vec cr) defined above.
+	*/
+	mat get_n23f0finf(vec cr /** Cubic root of the electron density, pow(rho,1/3.) */);
+
+	/**
+	* Plasma frequency of 3D electron gas
+	*/
+	vec omega_pl(vec rho /** Electron density */);
 }
 
 #endif // XC_HEADER

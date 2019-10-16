@@ -4,13 +4,17 @@
 // Copyright (C) 2019 by Dmitry R. Gulevich
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
-#include <armadillo>
 #include "tdcdft-omxc/systems.hpp"
+#include "tdcdft-omxc/mesh.hpp"
 #include "tdcdft-omxc/xc.hpp"
+#include "tdcdft-omxc/dft.hpp"
+#include <armadillo>
 
 namespace tddft {
 
-	// Time-dependent Kohn-Sham equation parameters
+	/** 
+	* Parameters for the time-dependent Kohn-Sham equation (TDKS)
+	*/
 	struct Args {
 		double tmin;
 		double tmax;
@@ -18,14 +22,18 @@ namespace tddft {
 		int ncorrections;
 	};
 
-
+	/** 
+	* Desired struct for the results of the TDKS evolution
+	*/
 	struct Result {
 		vec t;
 		vec dipole;
 	};
 
-	// Declarations for public functions
-	Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs &ks, Args args);
+	/**
+	* Evolve the time-dependent Kohn-Sham equation with memory
+	*/
+	Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, dft::KsGs &ks, Args args);
 
 } // end of namespace dft
 

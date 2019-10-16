@@ -47,7 +47,7 @@ struct InfQW : QuantumWell {
 	}
 };
 
-struct Fxc_custom : xc::FXC {
+struct Fxc_custom : xc::Omxc {
 
 	Fxc_custom() {
 		Mosc=1;
@@ -100,7 +100,7 @@ int main() {
 	cout << "# ns: " << qwell.ns << endl;
 
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
-	tddft::Args args = {0., 500., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
+	tddft::Args args = {0., 1000., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
 
 	Fxc_custom fxc;
 //	Fxc_ALDA fxc;

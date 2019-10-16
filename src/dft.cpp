@@ -3,11 +3,16 @@
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
 #include "tdcdft-omxc/dft.hpp"
+#include "tdcdft-omxc/systems.hpp"
+#include "tdcdft-omxc/mesh.hpp"
 #include "tdcdft-omxc/xc.hpp"
+#include <armadillo>
 
 namespace dft {
 
-	// M+1 intervals of length dz=W/(M+1); infinite boundaries at m=-1 and m=M; M-1 internal nodes
+	/**
+	* Calculate Hartree potential for a quantum well discretized by Mesh<QuantumWell>
+	*/
 	vec get_VHartree(Mesh<QuantumWell> &mesh, vec &rho, double ns) {
 		double dzdzfactor = -4.*M_PI*mesh.dz*mesh.dz/12.;
 		vec VH(mesh.M);
@@ -19,6 +24,9 @@ namespace dft {
 		return VH;
 	}
 	
+	/**
+	* Stationary Kohn-Sham equation.
+	*/
 	KsGs Ks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, KsArgs args) {
 
 		vec Vext(mesh.M);

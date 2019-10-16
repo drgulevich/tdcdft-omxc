@@ -2,25 +2,62 @@
 // Copyright (C) 2019 by Dmitry R. Gulevich
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
-#include <armadillo>
-#include "tdcdft-omxc/xc.hpp"
 #include "tdcdft-omxc/dft.hpp"
 #include "tdcdft-omxc/tddft.hpp"
+#include "tdcdft-omxc/systems.hpp"
+#include "tdcdft-omxc/mesh.hpp"
+#include "tdcdft-omxc/xc.hpp"
+#include <armadillo>
 
 #define EXP_ORDER 3
 
 namespace tddft {
 
-// ksorbs assumed to be real
+/** 
+* Convert the potential to Kohn-Sham basis given by REAL orbitals.
+* The potential matrix in real space is given by its diagonal (vector v). 
+*/
 mat to_ksbasis(Mesh<QuantumWell> &mesh, dft::KsGs &ks, vec &v) {
 	uword dim = ks.ens.n_elem;
 	mat vmatrix(dim,dim);
 	for(uword n1=0;n1<dim;++n1)
 		for(uword n2=0;n2<dim;++n2)
-			vmatrix(n1,n2) = mesh.dz*accu( ks.orbs.col(n1) % v % ks.orbs.col(n2) );
+			vmatrix(n1,n2) = mesh.dz*sum( ks.orbs.col(n1) % v % ks.orbs.col(n2) );
 	return vmatrix;
 }
 
+/**
+* Calculate gradient of a real vector v using central differences. 
+* The boundaries are treated by 2nd order differences.
+*/
+vec grad(Mesh<QuantumWell> &mesh, vec &v) {
+	uword dim = v.n_elem;
+	vec result(dim);
+	double factor = 1./(2.*mesh.dz);
+	result(span(1,dim-2)) = factor*(v.tail(dim-2)-v.head(dim-2)); // central differences
+	result(0) = factor*(-3.*v(0)+4.*v(1)-v(2)); // 2nd order edge
+	result(dim-1) = -factor*(-3.*v(dim-1)+4.*v(dim-2)-v(dim-3)); // 2nd order edge
+	return result;
+}
+
+/**
+* Calculate gradient of a complex vector psi using central differences. 
+* The boundaries are treated by 2nd order differences.
+*/
+cx_vec grad(Mesh<QuantumWell> &mesh, cx_vec &psi) {
+	uword dim = psi.n_elem;
+	cx_vec result(dim);
+	double factor = 1./(2.*mesh.dz);
+	result(span(1,dim-2)) = factor*(psi.tail(dim-2)-psi.head(dim-2)); // central differences
+	result(0) = factor*(-3.*psi(0)+4.*psi(1)-psi(2)); // 2nd order edge
+	result(dim-1) = -factor*(-3.*psi(dim-1)+4.*psi(dim-2)-psi(dim-3)); // 2nd order edge
+	return result;
+}
+
+/**
+* Calculate gradients complex vectors (given by columns of the matrix psi) using central differences. 
+* The boundaries are treated by 2nd order differences.
+*/
 cx_mat grad(Mesh<QuantumWell> &mesh, cx_mat &psi) {
 	uword dim = psi.n_rows;
 	cx_mat result(dim,psi.n_cols);
@@ -33,27 +70,9 @@ cx_mat grad(Mesh<QuantumWell> &mesh, cx_mat &psi) {
 	return result;
 }
 
-cx_vec grad(Mesh<QuantumWell> &mesh, cx_vec &psi) {
-	uword dim = psi.n_elem;
-	cx_vec result(dim);
-	double factor = 1./(2.*mesh.dz);
-	result(span(1,dim-2)) = factor*(psi.tail(dim-2)-psi.head(dim-2)); // central differences
-	result(0) = factor*(-3.*psi(0)+4.*psi(1)-psi(2)); // 2nd order edge
-	result(dim-1) = -factor*(-3.*psi(dim-1)+4.*psi(dim-2)-psi(dim-3)); // 2nd order edge
-	return result;
-}
-
-vec grad(Mesh<QuantumWell> &mesh, vec &v) {
-	uword dim = v.n_elem;
-	vec result(dim);
-	double factor = 1./(2.*mesh.dz);
-	result(span(1,dim-2)) = factor*(v.tail(dim-2)-v.head(dim-2)); // central differences
-	result(0) = factor*(-3.*v(0)+4.*v(1)-v(2)); // 2nd order edge
-	result(dim-1) = -factor*(-3.*v(dim-1)+4.*v(dim-2)-v(dim-3)); // 2nd order edge
-	return result;
-}
-
-
+/**
+* Get new values for the memory variables.
+*/
 cx_mat get_memory(cx_mat &p, cx_mat &previous_memory, vec &previous_gradv, vec &gradv, double dt) {
 
 	uword nrows = previous_memory.n_rows;
@@ -98,7 +117,9 @@ cx_mat get_memory(cx_mat &p, cx_mat &previous_memory, vec &previous_gradv, vec &
 }
 
 
-//mat get_VxcM(Mesh<QuantumWell> &mesh, cx_mat &memory, vec &n13, cx_mat &p) {
+/**
+* Get the memory part of a scalar Vxc potential within the ALDA+M theory (only in quasi-1D with one nontrivial direction)
+*/
 mat get_VxcM(Mesh<QuantumWell> &mesh, cx_mat &memory, vec &n13, cx_mat &n23Coeffs) {
 
 	vec n23sxc = real(n23Coeffs.col(0) % memory.col(0));
@@ -111,12 +132,18 @@ mat get_VxcM(Mesh<QuantumWell> &mesh, cx_mat &memory, vec &n13, cx_mat &n23Coeff
 }
 
 
+/**
+* Calculate the dipole moment
+*/
 double get_dipole(Mesh<QuantumWell> &mesh, vec &rho) {
-	return mesh.dz*accu( mesh.z % rho );
+	return mesh.dz*sum( mesh.z % rho );
 }
 
 
-Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs &ks, Args args) {
+/**
+* Evolve the time-dependent Kohn-Sham equation with memory
+*/
+Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, dft::KsGs &ks, Args args) {
 
 	vec Vext(mesh.M);
 	for(uword m=0; m<mesh.M; ++m)
@@ -153,7 +180,6 @@ Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs
 		t_array.push_back(t);
 		dipole_array.push_back(d);
 
-
 		// weights
 		vec weights(qwell.Nocc); 
 		for(uword m=0; m<qwell.Nocc; ++m)
@@ -167,8 +193,6 @@ Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs
 			cx_mat rhs = H_right*previous.Cpsi;
 			current.Cpsi = solve(H_left, rhs, solve_opts::fast); 
 			cx_mat psi  = ks.orbs * current.Cpsi;
-
-			//rho = qwell.ns*real(conj(psi)%psi);
 
 			// Calculate electron density
 			rho = zeros<vec>(mesh.M);
@@ -217,5 +241,4 @@ Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::FXC &fxc, dft::KsGs
 	return result;
 }
 
-	
 } // end of namespace tddft

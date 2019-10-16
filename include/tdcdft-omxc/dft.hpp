@@ -4,28 +4,46 @@
 // Copyright (C) 2019 by Dmitry R. Gulevich
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
-#include <armadillo>
 #include "tdcdft-omxc/systems.hpp"
+#include "tdcdft-omxc/mesh.hpp"
+#include <armadillo>
 
 namespace dft {
 
+	/**
+	* Kohn-Sham ground state.
+	*/
 	struct KsGs {
-		vec rho; // rho_gs = ns*psi*psi.t();
-		vec Veff; // KS potential corresponding to rho
-		vec ens; // KS energies
-		mat orbs; // KS orbitals, assumed to be real
-		std::vector<vec> rhoarr; // container for densities to check convergence
+		vec rho; /**< Electron density. */
+		vec Veff; /**< Effective Kohn-Sham potential. */
+		vec ens; /**< Kohn-Sham energies. */
+		mat orbs; /**< Kohn-Sham orbitals, assumed to be real. */
+		std::vector<vec> rhoarr; /**< Container for electron density values for convergence checks. */
 	};
 
-	// Stationary Kohn-Sham equation parameters
+	/** 
+	* Parameters for the stationary Kohn-Sham equation.
+	*/
 	struct KsArgs {
-		int nbands;
-		int niters; // number of iterations
-		double theta; // parameter for smooth update
+		int nbands; /**< Number of bands to calculate for. */
+		int niters; /**< Number of iterations. */
+		double theta; /**< Parameter for smooth update of Veff from one iteration to the next one. */
 	};
 
-	// Declarations for public functions
+	/**
+	* Calculate Hartree potential for a quantum well.
+	* @param mesh Mesh<QuantumWell> object.
+	* @param rho Electron density array.
+	* @param ns Sheet electron density in a quantum well.
+	*/
 	vec get_VHartree(Mesh<QuantumWell> &mesh, vec &rho, double ns);
+
+	/**
+	* Solve the stationary Kohn-Sham equation.
+	* @param qwell QuantumWell object.
+	* @param mesh Mesh<QuantumWell> object.
+	* @param ksargs Parameters for the stationary Kohn-Sham equation as a KsArgs struct.
+	*/
 	KsGs Ks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, KsArgs ksargs);
 
 } // end of namespace dft

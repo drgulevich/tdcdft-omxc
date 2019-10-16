@@ -18,6 +18,7 @@
 */
 
 #include "tdcdft-omxc/xc.hpp"
+#include <armadillo>
 #include <cmath>
 
 namespace xc {
@@ -51,17 +52,6 @@ namespace xc {
 		}
 		return result;
 	}
-
-
-	/*
-	// This function gives no advantage over pow(rho,1/3.). 
-	// Actually it turns out even a bit slower. Commented out.
-	vec get_cbrt(vec rho) {
-		vec result(rho.n_elem);
-		for(uword m=0;m<rho.n_elem;++m) 
-			result(m) = cbrt(rho(m));
-		return result;
-	}*/
 
 	// LDA xc potential
 	vec get_VxcLDA(vec cr) {
@@ -100,8 +90,7 @@ namespace xc {
 
 	// Returns: n^(2/3) * finf, 
 	//		where finf is given by Eq.(2) Iwamoto
-	// Warning: division by zero at n=0: 
-	//			log(arg)/cr1 -> 1 at n->0
+	// Warning! Division by zero at n=0: log(arg)/cr1 -> 1 at n->0
 	vec get_n23finf(vec cr) {
 		vec result(cr.n_elem);	
 		for(uword m=0;m<cr.n_elem;++m) {
@@ -137,11 +126,34 @@ namespace xc {
 		return n23f0finf;
 	}
 
+	/** 
+	* Eq.(16) of Z. Qian and G. Vignale, Phys. Rev. B65, 235121 (2002).
+	*/
+	vec S3L(vec lam) {
+		vec result(lam.n_elem);
+		static const double factor = -1./(45.*M_PI);
+		for(uword m=0;m<lam.n_elem;++m) {
+			double part1 = 5.-(lam[m]+5./lam[m])*atan(lam[m]);
+			double part2 = -(2./lam[m])*asin(lam[m]/sqrt(1.+lam[m]*lam[m]));
+			double arg = 1./(lam[m]*sqrt(2.+lam[m]*lam[m]));
+			double part3 = arg*(M_PI - 2.*atan(arg));
+			result[m] = factor*(part1+part2+part3);
+		}
+		return result;
+	}
+    
+	// Returns: n^(2/3) * (d/domega)Imfxc(n,0)
+	vec get_n23ImDfxc(vec rho, vec n13) {
+		static const double factorkf = cbrt(3.*M_PI*M_PI); // kf = factorkf*n13;
+		vec kf = factorkf*n13;
+		vec lam = sqrt(M_PI*kf); // 2kf/ks    
+		return -factorkf*S3L(lam)/(M_PI*M_PI*rho);
+	}
 
-	/*vec omega_pl(vec rho) {
+	vec omega_pl(vec rho) {
 		static const double factor = sqrt(4.*M_PI);
 		return factor*sqrt(rho);
-	}*/
+	}
 
 } // end of xc namespace
 
