@@ -3,8 +3,10 @@ image: alpine
 before_script:
 - apk update
 - apk add doxygen
-## Uncomment the following line if you use graphviz dot graphs
 - apk add ttf-freefont graphviz
+- apk --no-cache add py2-pip python-dev
+- pip install sphinx
+- apk --no-cache add make
 
 test:
   script:
@@ -16,6 +18,7 @@ pages:
   script:
   - cd docs
   - doxygen Doxyfile
+  - make html
   - cd ..
   - mv docs/html/ public/
   artifacts:
