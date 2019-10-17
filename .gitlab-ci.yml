@@ -18,7 +18,7 @@ pages:
   script:
   - cd docs
   - mkdir _build
-  - mkdit _build/html
+  - mkdir _build/html
   - mkdir _build/html/doxy
   - mkdir _build/latex
   - mkdir _build/latex/doxy
