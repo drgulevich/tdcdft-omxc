@@ -9,6 +9,8 @@
 
 using namespace arma;
 
+namespace tdcdft { 
+
 /**
 * Mesh templates for various types of systems
 */
@@ -57,5 +59,7 @@ struct Mesh <Cluster> {
 template <>
 struct Mesh <Fullerene> {
 };
+
+}
 
 #endif // MESH_HEADER

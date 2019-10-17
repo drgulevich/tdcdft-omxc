@@ -8,6 +8,8 @@
 
 using namespace arma;
 
+namespace tdcdft { 
+
 /**
 * Electron system (an abstract class used by derived classes).
 */
@@ -46,5 +48,7 @@ struct Cluster : ElectronSystem {
 struct Fullerene : ElectronSystem {
 	int Ne; // Number of electrons
 };
+
+}
 
 #endif // SYSTEMS_HEADER

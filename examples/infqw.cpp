@@ -4,14 +4,16 @@
 // -------------------------------------------------------
 #include <iostream>
 #include <chrono>  // timing
-#include "tdcdft-omxc/dft.hpp"
-#include "tdcdft-omxc/tddft.hpp"
+#include "tdcdft-omxc/gs.hpp"
+#include "tdcdft-omxc/td.hpp"
+#include "tdcdft-omxc/xc.hpp"
 #include "tdcdft-omxc/tools.hpp"
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 #include "tdcdft-omxc/fxcmodels.hpp" // supplementary fxc structs
 
 using namespace std; 
 using namespace arma; 
+using namespace tdcdft;
 
 #define OUTPUT
 
@@ -57,7 +59,7 @@ struct Fxc_custom : xc::Omxc {
 	cx_mat get_p(vec rho) {
 		cx_double i(0.,1.);
 		cx_mat p(rho.n_elem, Mosc);
-		p.col(0) = (2.-2.*i)*omega_pl(rho);
+		p.col(0) = (2.-2.*i)*xc::omega_pl(rho);
 		return p;
 	}
 
@@ -73,15 +75,15 @@ struct Fxc_custom : xc::Omxc {
 
 int main() {
 
-	recommend_num_threads(1);
+	tools::recommend_num_threads(1);
 
 	InfQW qwell;
 	Mesh<QuantumWell> mesh = qwell.mesh(100);
-	dft::KsGs ks;
-	dft::KsArgs ksargs = {10,100,0.1}; // Set number of bands, iterations and smoothness (-std=c++17)
+	KsGs ks;
+	KsArgs ksargs = {10,100,0.1}; // Set number of bands, iterations and smoothness (-std=c++17)
 
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
-	ks = dft::Ks(qwell, mesh, ksargs); // Solve KS equation
+	ks = Ks(qwell, mesh, ksargs); // Solve KS equation
 
 	cout << "# Lowest subband spacing at Efield = " << qwell.Efield << ": "
 		<< qwell.effau.Eh*(ks.ens(1)-ks.ens(0)) << ", "
@@ -89,7 +91,7 @@ int main() {
 		<< qwell.effau.Eh*(ks.ens(3)-ks.ens(0)) << endl;
 
 	qwell.Efield = qwell.effau.to_au(0.5,"mV/nm");
-	ks = dft::Ks(qwell, mesh, ksargs); // Solve KS equation 
+	ks = Ks(qwell, mesh, ksargs); // Solve KS equation 
 
 	cout << "# Lowest subband spacing at Efield = " << qwell.Efield << ": "
 		<< qwell.effau.Eh*(ks.ens(1)-ks.ens(0)) << ", "
@@ -100,23 +102,23 @@ int main() {
 	cout << "# ns: " << qwell.ns << endl;
 
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
-	tddft::Args args = {0., 1000., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
+	TdArgs args = {0., 1000., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
 
 	Fxc_custom fxc;
-//	Fxc_ALDA fxc;
-//	Fxc_M1_test fxc;
-//	Fxc_M1_D0 fxc;
-//	Fxc_M1_DQV fxc;
+//	xc::Fxc_ALDA fxc;
+//	xc::Fxc_M1_test fxc;
+//	xc::Fxc_M1_D0 fxc;
+//	xc::Fxc_M1_DQV fxc;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	tddft::Result tdks = tddft::Tdks(qwell, mesh, fxc, ks, args);
+	TdDipole dipole = Tdks(qwell, mesh, fxc, ks, args);
 
 	auto finish = std::chrono::high_resolution_clock::now();
 
 #ifdef OUTPUT
-	for(uword i=0;i<tdks.t.n_elem;++i)
-		cout << tdks.t(i) << " " << tdks.dipole(i) << endl;
+	for(uword i=0;i<dipole.t.n_elem;++i)
+		cout << dipole.t(i) << " " << dipole.value(i) << endl;
 #endif
 
     std::cout << "# Timing: "

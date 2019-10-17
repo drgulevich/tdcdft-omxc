@@ -16,12 +16,11 @@
 	[3] V. V. Karasiev, “Comment on ‘Communication: Simple and accurate uniform electron gas correlation energy for the full range of densities”,
 		J. Chem. Phys., vol. 145, p. 157101, 2016.
 */
-
 #include "tdcdft-omxc/xc.hpp"
 #include <armadillo>
 #include <cmath>
 
-namespace xc {
+namespace tdcdft { namespace xc {
 
 	const double ax = -(3./4.)*cbrt(3./M_PI);
 	const double ac = (log(2.)-1.)/(2.*M_PI*M_PI);
@@ -155,5 +154,4 @@ namespace xc {
 		return factor*sqrt(rho);
 	}
 
-} // end of xc namespace
-
+} }

@@ -14,6 +14,8 @@
 #include "tdcdft-omxc/systems.hpp"
 #include "tdcdft-omxc/mesh.hpp"
 
+namespace tdcdft {
+
 /**
 * Quantum well AlGaAs/GaAs/AlGaAs with one occupied orbital.
 * Parameters of the well are from Ref. C. A. Ullrich and G. Vignale,
@@ -210,5 +212,7 @@ struct QWell_WU_PRL_2008 : QuantumWell {
 		return mesh;
 	}
 };
+
+}
 
 #endif // QWMODELS_HEADER

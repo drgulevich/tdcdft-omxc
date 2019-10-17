@@ -10,7 +10,7 @@
 
 using namespace arma;
 
-namespace dft {
+namespace tdcdft { 
 
 	/**
 	* Kohn-Sham ground state.
@@ -33,14 +33,6 @@ namespace dft {
 	};
 
 	/**
-	* Calculate Hartree potential for a quantum well.
-	* @param mesh Mesh<QuantumWell> object.
-	* @param rho Electron density array.
-	* @param ns Sheet electron density in a quantum well.
-	*/
-	vec get_VHartree(Mesh<QuantumWell> &mesh, vec &rho, double ns);
-
-	/**
 	* Solve the stationary Kohn-Sham equation.
 	* @param qwell QuantumWell object.
 	* @param mesh Mesh<QuantumWell> object.
@@ -48,6 +40,6 @@ namespace dft {
 	*/
 	KsGs Ks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, KsArgs ksargs);
 
-} // end of namespace dft
+}
 
 #endif // DFT_HEADER

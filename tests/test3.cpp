@@ -6,23 +6,24 @@
 #include <chrono>  // timing
 #include "catch2/catch.hpp" // testing framework
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
-#include "tdcdft-omxc/dft.hpp"
+#include "tdcdft-omxc/gs.hpp"
 #include "tdcdft-omxc/tools.hpp"
 
 using namespace std; 
 using namespace arma; 
+using namespace tdcdft;
 
 TEST_CASE( "Comparison to energy spacing in a double quantum well from the Ullrich-Vignale-PRB-1998", "[dft]" ) {
 
 	cout << "Test 3: " << endl;
-	recommend_num_threads(1);
+	tools::recommend_num_threads(1);
 
 	DQWell_UV_PRB_1998 dqwell;
 	Mesh<QuantumWell> mesh = dqwell.DQWmesh(300);
-	dft::KsGs ks;
-	dft::KsArgs ksargs = {10,100,0.1}; // { number of bands, iterations, smoothness }
+	KsGs ks;
+	KsArgs ksargs = {10,100,0.1}; // { number of bands, iterations, smoothness }
 	dqwell.Efield = dqwell.effau.to_au(0.0,"mV/nm");
-	ks = dft::Ks(dqwell, mesh, ksargs); // Solve KS equation 
+	ks = Ks(dqwell, mesh, ksargs); // Solve KS equation 
 
 	vec result(3);
     for(uword i=0;i<result.n_elem;++i) {

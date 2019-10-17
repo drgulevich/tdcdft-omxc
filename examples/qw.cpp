@@ -4,28 +4,29 @@
 // -------------------------------------------------------
 #include <iostream>
 #include <chrono>  // timing
-#include "tdcdft-omxc/dft.hpp"
-#include "tdcdft-omxc/tddft.hpp"
+#include "tdcdft-omxc/gs.hpp"
+#include "tdcdft-omxc/td.hpp"
 #include "tdcdft-omxc/tools.hpp"
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
 #include "tdcdft-omxc/fxcmodels.hpp" // supplementary fxc structs
 
 using namespace std; 
 using namespace arma; 
+using namespace tdcdft;
 
 #define OUTPUT
 
 int main() {
 
-	recommend_num_threads(1);
+	tools::recommend_num_threads(1);
 
 	QWell_WU_PRL_2008 qwell;
 	Mesh<QuantumWell> mesh = qwell.GaAs_mesh(100);
-	dft::KsGs ks;
-	dft::KsArgs ksargs = {10,100,0.1}; // Set number of bands, iterations and smoothness (-std=c++17)
+	KsGs ks;
+	KsArgs ksargs = {10,100,0.1}; // Set number of bands, iterations and smoothness (-std=c++17)
 
 	qwell.Efield = qwell.effau.to_au(0.01,"mV/nm");
-	ks = dft::Ks(qwell, mesh, ksargs); // Solve KS equation
+	ks = Ks(qwell, mesh, ksargs); // Solve KS equation
 
 	cout << "# Energies at Efield = " << qwell.Efield << ": "
 		<< qwell.effau.Eh*ks.ens(0) << ", "
@@ -44,19 +45,19 @@ int main() {
 	cout << "# qwell.ns: " << qwell.ns << endl;
 
 	qwell.Efield = qwell.effau.to_au(0.0,"mV/nm");
-	tddft::Args args = {0., 50., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
+	TdArgs args = {0., 50., 0.05, 3}; // {0., 100., 0.05, 3} gives visually converged results when plotted
 
-	Fxc_M1_D0 fxc;
+	xc::Fxc_M1_D0 fxc;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	tddft::Result tdks = tddft::Tdks(qwell, mesh, fxc, ks, args);
+	TdDipole dipole = Tdks(qwell, mesh, fxc, ks, args);
 
 	auto finish = std::chrono::high_resolution_clock::now();
 
 #ifdef OUTPUT
 	for(uword i=0;i<tdks.t.n_elem;++i)
-		cout << tdks.t(i) << " " << tdks.dipole(i) << endl;
+		cout << dipole.t(i) << " " << dipole.value(i) << endl;
 #endif
 
     std::cout << "# Timing: "

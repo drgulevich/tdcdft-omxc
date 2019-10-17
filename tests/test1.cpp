@@ -6,23 +6,24 @@
 #include <chrono>  // timing
 #include "catch2/catch.hpp" // testing framework
 #include "tdcdft-omxc/qwmodels.hpp" // supplementary QuantumWell structs
-#include "tdcdft-omxc/dft.hpp"
+#include "tdcdft-omxc/gs.hpp"
 #include "tdcdft-omxc/tools.hpp"
 
 using namespace std; 
 using namespace arma; 
+using namespace tdcdft;
 
 TEST_CASE( "Comparison to qwell.GaAs_mesh(100), ksargs = {10,100,0.1} at field 0.5 mV/nm", "[dft]" ) {
 
 	cout << "Test 1: " << endl;
-	recommend_num_threads(1);
+	tools::recommend_num_threads(1);
 
 	QWell_WU_PRL_2005 qwell;
 	Mesh<QuantumWell> mesh = qwell.GaAs_mesh(100);
-	dft::KsGs ks;
-	dft::KsArgs ksargs = {10,100,0.1}; // { number of bands, iterations, smoothness }
+	KsGs ks;
+	KsArgs ksargs = {10,100,0.1}; // { number of bands, iterations, smoothness }
 	qwell.Efield = qwell.effau.to_au(0.5,"mV/nm");
-	ks = dft::Ks(qwell, mesh, ksargs); // Solve KS equation 
+	ks = Ks(qwell, mesh, ksargs); // Solve KS equation 
 
 	vec result(3);
     for(uword i=0;i<result.n_elem;++i) {

@@ -2,22 +2,21 @@
 // Copyright (C) 2019 by Dmitry R. Gulevich
 // You may use or modify this code but not distribute it.
 // -------------------------------------------------------
-#include "tdcdft-omxc/dft.hpp"
-#include "tdcdft-omxc/tddft.hpp"
+#include "tdcdft-omxc/gs.hpp"
+#include "tdcdft-omxc/td.hpp"
 #include "tdcdft-omxc/systems.hpp"
 #include "tdcdft-omxc/mesh.hpp"
+#include "tdcdft-omxc/hartree.hpp"
 #include "tdcdft-omxc/xc.hpp"
 #include <armadillo>
 
-#define EXP_ORDER 3
-
-namespace tddft {
+namespace tdcdft {
 
 /** 
 * Convert the potential to Kohn-Sham basis given by REAL orbitals.
 * The potential matrix in real space is given by its diagonal (vector v). 
 */
-mat to_ksbasis(Mesh<QuantumWell> &mesh, dft::KsGs &ks, vec &v) {
+mat to_ksbasis(Mesh<QuantumWell> &mesh, KsGs &ks, vec &v) {
 	uword dim = ks.ens.n_elem;
 	mat vmatrix(dim,dim);
 	for(uword n1=0;n1<dim;++n1)
@@ -143,14 +142,14 @@ double get_dipole(Mesh<QuantumWell> &mesh, vec &rho) {
 /**
 * Evolve the time-dependent Kohn-Sham equation with memory
 */
-Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, dft::KsGs &ks, Args args) {
+TdDipole Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, KsGs &ks, TdArgs args) {
 
 	vec Vext(mesh.M);
 	for(uword m=0; m<mesh.M; ++m)
 		Vext(m) = qwell.Vext(mesh.z(m));
 
     struct State {
-	    State(QuantumWell &qwell, dft::KsGs &ks, uword ncols) {
+	    State(QuantumWell &qwell, KsGs &ks, uword ncols) {
 	    	Hmatrix = diagmat(ks.ens);
 	    	Cpsi = eye<cx_mat>(ks.ens.n_elem,qwell.Nocc);
 			if(ncols>0) {
@@ -172,7 +171,7 @@ Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, dft::KsG
 
 	double t=args.tmin;
 	vec rho = ks.rho;
-	Result result;
+	TdDipole dipole;
 
 	do {
 
@@ -199,7 +198,7 @@ Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, dft::KsG
 			for(uword m=0; m<qwell.Nocc; ++m)
 				rho += weights(m) * real( conj(psi.col(m)) % psi.col(m) );
 
-			vec VHartree = dft::get_VHartree(mesh,rho,qwell.ns);
+			vec VHartree = get_VHartree(mesh,rho,qwell.ns);
 			vec dV = Vext + VHartree - ks.Veff;
 
 			if(fxc.Mosc>=0) { // ALDA and beyond 
@@ -236,9 +235,9 @@ Result Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, dft::KsG
 
 	} while(t<args.tmax);
 
-	result.dipole = conv_to<vec>::from(dipole_array); 
-	result.t = conv_to<vec>::from(t_array); 
-	return result;
+	dipole.value = conv_to<vec>::from(dipole_array); 
+	dipole.t = conv_to<vec>::from(t_array); 
+	return dipole;
 }
 
-} // end of namespace tddft
+}

@@ -8,7 +8,7 @@
 
 using namespace arma;
 
-namespace xc {
+namespace tdcdft { namespace xc {
 
 	/**
 	* An abstract class for xc kernels in the OMXC form
@@ -80,6 +80,6 @@ namespace xc {
 	*/
 	vec omega_pl(vec rho /** Electron density */);
 
-}
+} }
 
 #endif // XC_HEADER

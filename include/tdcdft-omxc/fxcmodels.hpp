@@ -15,6 +15,8 @@
 
 using namespace arma;
 
+namespace tdcdft { namespace xc {
+
 /**
 * fxc for ALDA
 */
@@ -121,5 +123,9 @@ struct Fxc_M1_DQV : xc::Omxc {
 	}
 
 };
+
+} // end of xc namespace
+
+}
 
 #endif // FXCMODELS_HEADER
