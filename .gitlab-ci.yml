@@ -25,7 +25,8 @@ pages:
   - mkdir _build/latex/doxy
   - doxygen Doxyfile
   - make html
-  - mv _build/html/ public/
+  - cd ..
+  - mv docs/_build/html/ public/
   artifacts:
     paths:
     - public
