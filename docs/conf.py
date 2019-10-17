@@ -14,6 +14,9 @@
 #import sys
 #sys.path.insert(0, os.path.abspath('.'))
 
+### if contents.rst is absent
+master_doc = 'index'
+
 # -- Project information -----------------------------------------------------
 
 project = 'tdcdft-omxc'
