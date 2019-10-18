@@ -47,7 +47,7 @@ Run examples::
 
     $ make
 
-e.g. example infqw.cpp outputs dynamics of the dipole moment which can be processed as follows:
+e.g. example infqw.cpp outputs dynamics of the dipole moment which can be processed as follows::
 
     $ ./infqw > out
 
