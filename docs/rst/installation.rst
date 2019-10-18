@@ -1,39 +1,55 @@
+============
 Installation
 ============
 
-**Dependencies:**
+Download
+========
+Copy or clone the source from GitLab repository::
 
-`Armadillo C++ library <http://arma.sourceforge.net>`_
+	$ git clone [the link to be provided]
 
-The code is build in-source with CMake. From the source folder run:
+Requirements
+============
 
-   $ cmake .
+* C++ compiler
+* `Armadillo C++ library <http://arma.sourceforge.net>`_
 
-   $ make
+Installation
+============
+
+The code is build in-source with CMake. From the source folder run::
+
+    $ cmake .
+
+    $ make
 
 will generate a static library ``tdcdft-omxc.a`` in the source directory.
 
-Run tests:
+Tests
+=====
+Run tests::
 
-   $ cd tests
+    $ cd tests
 
-   $ cmake .
+    $ cmake .
 
-   $ make
+    $ make
 
-   $ ./tests
+    $ ./tests
 
-Run examples:
+Examples
+========
+Run examples::
 
-   $ cd examples
+    $ cd examples
 
-   $ cmake .
+    $ cmake .
 
-   $ make
+    $ make
 
-   $ ./infqw
+e.g. example infqw.cpp outputs dynamics of the dipole moment which can be processed as follows:
 
-   $ ./qw
+    $ ./infqw > out
 
-
+    $ ./plot.py
 
