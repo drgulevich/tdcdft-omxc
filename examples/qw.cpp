@@ -56,7 +56,7 @@ int main() {
 	auto finish = std::chrono::high_resolution_clock::now();
 
 #ifdef OUTPUT
-	for(uword i=0;i<tdks.t.n_elem;++i)
+	for(uword i=0;i<dipole.t.n_elem;++i)
 		cout << dipole.t(i) << " " << dipole.value(i) << endl;
 #endif
 

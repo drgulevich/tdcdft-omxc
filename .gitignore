@@ -4,9 +4,8 @@
 # Unignore all dirs except for CMakeFiles
 !*/
 CMakeFiles
-
-# Ignore build/
 build/*
+spike/
 
 # Unignore the following
 !*.cpp
