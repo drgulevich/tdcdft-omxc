@@ -16,7 +16,7 @@ namespace tdcdft { namespace xc {
 	struct Omxc {
 		uword Mosc;
 		virtual cx_mat get_p(vec rho) = 0; // pure virtual
-		virtual cx_mat get_n23Coeffs(cx_mat p, vec n13) = 0; // pure virtual
+		virtual cx_mat get_n23C(cx_mat p, vec n13) = 0; // pure virtual
 		virtual ~Omxc() {} // virtual destructor
 	};
 

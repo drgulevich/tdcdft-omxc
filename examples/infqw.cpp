@@ -64,7 +64,7 @@ struct Fxc_custom : xc::Omxc {
 	}
 
 	// Returns: n^(2/3) * Cm
-	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
+	cx_mat get_n23C(cx_mat p, vec n13) {
 		mat n23f0finf = xc::get_n23f0finf(n13);
 		cx_mat Coeffs(p.n_rows,p.n_cols);
 		Coeffs.col(0) = conj(p.col(0)) % (n23f0finf.col(1)-n23f0finf.col(0)) / real(p.col(0));

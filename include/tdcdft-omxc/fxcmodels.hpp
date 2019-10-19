@@ -26,7 +26,7 @@ struct Fxc_ALDA : xc::Omxc {
     	cout << "# ALDA" << endl;
 	}
 	cx_mat get_p(vec rho) {}
-	cx_mat get_n23Coeffs(cx_mat p, vec n13) {}
+	cx_mat get_n23C(cx_mat p, vec n13) {}
 };
 
 /**
@@ -47,7 +47,7 @@ struct Fxc_M1_test : xc::Omxc {
 	}
 
 	// Returns: n^(2/3) * Cm
-	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
+	cx_mat get_n23C(cx_mat p, vec n13) {
 		mat n23f0finf = xc::get_n23f0finf(n13);
 		cx_mat Coeffs(p.n_rows,p.n_cols);
 		Coeffs.col(0) = conj(p.col(0)) % (n23f0finf.col(1)-n23f0finf.col(0)) / real(p.col(0));
@@ -80,7 +80,7 @@ struct Fxc_M1_D0 : xc::Omxc {
 	}
 
 	// Returns: n^(2/3) * Cm
-	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
+	cx_mat get_n23C(cx_mat p, vec n13) {
 		mat n23fxc = xc::get_n23f0finf(n13);
 		cx_mat Coeffs(p.n_rows,p.n_cols);
 		Coeffs.col(0) = p.col(0) % (n23fxc.col(1) - n23fxc.col(0)) / real(p.col(0));
@@ -113,7 +113,7 @@ struct Fxc_M1_DQV : xc::Omxc {
 	}
 
 	// Returns: n^(2/3) * Cm
-	cx_mat get_n23Coeffs(cx_mat p, vec n13) {
+	cx_mat get_n23C(cx_mat p, vec n13) {
 		mat n23fxc = xc::get_n23f0finf(n13);
 		cx_mat Coeffs(p.n_rows,p.n_cols);
 		vec rho = n13 % n13 % n13; // can be imporved by passing rho directly

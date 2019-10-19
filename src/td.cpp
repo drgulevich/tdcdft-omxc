@@ -119,11 +119,11 @@ cx_mat get_memory(cx_mat &p, cx_mat &previous_memory, vec &previous_gradv, vec &
 /**
 * Get the memory part of a scalar Vxc potential within the ALDA+M theory (only in quasi-1D with one nontrivial direction)
 */
-mat get_VxcM(Mesh<QuantumWell> &mesh, cx_mat &memory, vec &n13, cx_mat &n23Coeffs) {
+mat get_VxcM(Mesh<QuantumWell> &mesh, cx_mat &memory, vec &n13, cx_mat &n23C) {
 
-	vec n23sxc = real(n23Coeffs.col(0) % memory.col(0));
-	for(uword m=1;m<n23Coeffs.n_cols;++m)
-		n23sxc += real(n23Coeffs.col(m) % memory.col(m));
+	vec n23sxc = real(n23C.col(0) % memory.col(0));
+	for(uword m=1;m<n23C.n_cols;++m)
+		n23sxc += real(n23C.col(m) % memory.col(m));
 
 	vec gradn13 = grad(mesh,n13);
 	vec VxcM = -n13 % n23sxc - 3.*mesh.dz*cumsum(n23sxc % gradn13);
@@ -216,9 +216,9 @@ TdDipole Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, KsGs &
 
 					current.gradv = grad(mesh, vfield);
 					cx_mat p = fxc.get_p(rho);
-					cx_mat n23Coeffs = fxc.get_n23Coeffs(p, n13);
+					cx_mat n23C = fxc.get_n23C(p, n13);
 					current.memory = get_memory(p, previous.memory, previous.gradv, current.gradv, args.dt);
-					vec VxcM = get_VxcM(mesh, current.memory, n13, n23Coeffs);
+					vec VxcM = get_VxcM(mesh, current.memory, n13, n23C);
 
 					dV += VxcM;
 				}
