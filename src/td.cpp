@@ -148,6 +148,11 @@ TdDipole Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, KsGs &
 	for(uword m=0; m<mesh.M; ++m)
 		Vext(m) = qwell.Vext(mesh.z(m));
 
+	// occupation of the filled KS orbitals
+	vec weights(qwell.Nocc); 
+	for(uword m=0; m<qwell.Nocc; ++m)
+		weights(m) = (qwell.EF-ks.ens(m))/M_PI;
+
     struct State {
 	    State(QuantumWell &qwell, KsGs &ks, uword ncols) {
 	    	Hmatrix = diagmat(ks.ens);
@@ -174,15 +179,9 @@ TdDipole Tdks(QuantumWell &qwell, Mesh<QuantumWell> &mesh, xc::Omxc &fxc, KsGs &
 	TdDipole dipole;
 
 	do {
-
 		double d = get_dipole(mesh,rho);
 		t_array.push_back(t);
 		dipole_array.push_back(d);
-
-		// weights
-		vec weights(qwell.Nocc); 
-		for(uword m=0; m<qwell.Nocc; ++m)
-			weights(m) = (qwell.EF-ks.ens(m))/M_PI;
 
 		for(int nc=0; nc<args.ncorrections; ++nc) {
 
