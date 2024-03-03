@@ -1,4 +1,4 @@
-# tdcdft-omxc
+# Time-dependent Current Density Functional Theory (TDCDFT) with Oscillator Model Exchange-Correlation (OMXC) Kernels
 
 See detailed documentation at GitLab pages: https://drgulevich.gitlab.io/tdcdft-omxc
 
@@ -42,5 +42,5 @@ e.g. example qw.cpp outputs dynamics of the dipole moment which can be processed
 
 **Publications**
 
-1. D. R. Gulevich, Ya. V. Zhumagulov, A. V. Vagov, and V. Perebeinos, Nonadiabatic time-dependent density-functional theory at the cost of adiabatic local density approximation, https://arxiv.org/abs/1908.10941.
+1. D. R. Gulevich, Ya. V. Zhumagulov, A. V. Vagov, and V. Perebeinos, Nonadiabatic time-dependent density-functional theory at the cost of adiabatic local density approximation, Physical Review B 100 (24), 241109 (2019). arXiv: https://arxiv.org/abs/1908.10941.
 
